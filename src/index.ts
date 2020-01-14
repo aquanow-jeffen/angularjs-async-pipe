@@ -3,79 +3,67 @@ import { IScope } from 'angular';
 import { Observable, SubscriptionLike } from 'rxjs';
 
 type Subscription = SubscriptionLike | Promise<any>;
-
 type AsyncObject<T> = Observable<T> | Promise<T>;
-
 interface SubscriptionStrategy {
-    getValue(): any;
+    latestValue: any;
     createSubscription(async: AsyncObject<any>, updateLatestValue: any): Subscription;
     dispose(): void;
     onDestroy(): void;
 }
 
+function isObservable(obj: any): obj is Observable<any> {
+    return obj && typeof obj.subscribe === 'function';
+}
+
+function isPromise(obj: any): obj is Promise<any> {
+    return obj && typeof obj.then === 'function';
+}
+
 class ObservableStrategy implements SubscriptionStrategy {
     private _subscription: SubscriptionLike;
-    private _latestValue: any = null;
+    latestValue: any = null;
 
     createSubscription(async: Observable<any>, updateLatestValue: any): SubscriptionLike {
         const nextFn = (res: any) => {
-            this._latestValue = res;
+            this.latestValue = res;
             return updateLatestValue(res);
         };
         this._subscription = async.subscribe({next: nextFn, error: (e: any) => { throw e; }});
         return this._subscription;
     }
 
-    getValue(): any {
-        return this._latestValue;
-    }
-
     dispose(): void {
         this._subscription.unsubscribe();
-        this._latestValue = null;
+        this.latestValue = null;
     }
-
     onDestroy(): void { this._subscription.unsubscribe(); }
 }
 
 class PromiseStrategy implements SubscriptionStrategy {
     private _subscription: Promise<any>;
-    private _latestValue: any = null;
+    latestValue: any = null;
 
     createSubscription(async: Promise<any>, updateLatestValue: (v: any) => any): Promise<any> {
         const thenFn = (res: any) => {
-            this._latestValue = res;
+            this.latestValue = res;
             return updateLatestValue(res);
         };
         this._subscription = async.then(thenFn, e => { throw e; });
         return this._subscription;
     }
 
-    getValue(): any {
-        return this._latestValue;
+    dispose(): void {
+        this.latestValue = null;
     }
-
-    dispose(): void {}
-
     onDestroy(): void {}
-}
-  
-function isObservable(obj: any): obj is Observable<any> {
-    return typeof obj.subscribe === 'function';
-}
-
-function isPromise(obj: any): obj is Promise<any> {
-    return typeof obj.then === 'function';
 }
 
 class AsyncFilterClass {
     private _subscriptionMap: WeakMap<AsyncObject<any>, SubscriptionStrategy>;
-    // private _latestValueMap: WeakMap<AsyncObject<any>, any>;
 
     constructor() {
         this.transform = this.transform.bind(this);
         this._subscriptionMap = new WeakMap();
-        // this._latestValueMap = new WeakMap();
     }
 
     private _selectStrategy(obj: AsyncObject<any>) {
@@ -94,19 +82,15 @@ class AsyncFilterClass {
             obj, (value: Object) => this._updateLatestValue(obj, value, scope)
         );
         this._subscriptionMap.set(obj, strategy);
-        if (scope && scope.$on) {
-            scope.$on('$destroy', () => {
-                strategy.dispose();
-            });
-            console.log(scope, (scope as any).$onInit);
-        }
+        scope.$on('$destroy', () => {
+            strategy.dispose();
+            this._subscriptionMap.delete(obj);
+        });
     }
 
     private _updateLatestValue(async: any, value: Object, scope: IScope): void {
         if (this._subscriptionMap.has(async)) {
-            if (scope && scope.$applyAsync) {
-                scope.$applyAsync();
-            }
+            scope.$applyAsync();
         }
     }
 
@@ -115,17 +99,21 @@ class AsyncFilterClass {
     transform<T>(obj: Observable<T>|null|undefined, scope: IScope): T|null;
     transform<T>(obj: Promise<T>|null|undefined, scope: IScope): T|null;
     transform(obj: AsyncObject<any>|null|undefined, scope: IScope): any {
+        if (!scope) {
+            throw new SyntaxError('AsyncFilter: Scope object is expected. Please make sure you have correct syntax `{{ your_binding_value | async:this }}`');
+        }
         if (!this._subscriptionMap.has(obj)) {
             if (obj) {
                 this._subscribe(obj, scope);
             }
         }
-        // TODO: I need to resubscribe promise or observable when it re-render on screen
 
-        return this._subscriptionMap.get(obj).getValue();
+        return this._subscriptionMap.get(obj).latestValue;
     }
 }
 
-angular
+const module = angular
     .module('asyncFilterModule', [])
     .filter('async', () => new AsyncFilterClass().transform);
+    
+export default module.name;
