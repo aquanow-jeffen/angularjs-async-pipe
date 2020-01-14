@@ -3,10 +3,12 @@
         "outDir": "lib",
         "noImplicitAny": true,
         "module": "commonjs",
+        "moduleResolution": "node",
         "target": "es5",
         "lib": [
             "dom",
-            "es2015"
+            "es2016",
+            "es5"
         ],
         "declaration": true,
         "noUnusedLocals": true,

@@ -21,14 +21,10 @@ function isPromise(obj: any): obj is Promise<any> {
 
 class ObservableStrategy implements SubscriptionStrategy {
     private _subscription: SubscriptionLike;
-    latestValue: any = null;
+    latestValue: any;
 
     createSubscription(async: Observable<any>, updateLatestValue: any): SubscriptionLike {
-        const nextFn = (res: any) => {
-            this.latestValue = res;
-            return updateLatestValue(res);
-        };
-        this._subscription = async.subscribe({next: nextFn, error: (e: any) => { throw e; }});
+        this._subscription = async.subscribe({next: updateLatestValue, error: (e: any) => { throw e; }});
         return this._subscription;
     }
 
@@ -41,14 +37,10 @@ class ObservableStrategy implements SubscriptionStrategy {
 
 class PromiseStrategy implements SubscriptionStrategy {
     private _subscription: Promise<any>;
-    latestValue: any = null;
+    latestValue: any;
 
     createSubscription(async: Promise<any>, updateLatestValue: (v: any) => any): Promise<any> {
-        const thenFn = (res: any) => {
-            this.latestValue = res;
-            return updateLatestValue(res);
-        };
-        this._subscription = async.then(thenFn, e => { throw e; });
+        this._subscription = async.then(updateLatestValue, e => { throw e; });
         return this._subscription;
     }
 
@@ -79,7 +71,10 @@ class AsyncFilterClass {
     private _subscribe(obj:AsyncObject<any>, scope: IScope): void {
         const strategy: SubscriptionStrategy = this._selectStrategy(obj);
         strategy.createSubscription(
-            obj, (value: Object) => this._updateLatestValue(obj, value, scope)
+            obj, (value: Object) => {
+                strategy.latestValue = value;
+                this._updateLatestValue(obj, value, scope);
+            }
         );
         this._subscriptionMap.set(obj, strategy);
         scope.$on('$destroy', () => {
@@ -94,6 +89,11 @@ class AsyncFilterClass {
         }
     }
 
+    /**
+     * transform function take a async object and return the latested emitted value of the object.
+     * @param obj async object
+     * @param scope filter scope
+     */
     transform<T>(obj: null, scope: IScope): null;
     transform<T>(obj: undefined, scope: IScope): undefined;
     transform<T>(obj: Observable<T>|null|undefined, scope: IScope): T|null;
@@ -112,8 +112,7 @@ class AsyncFilterClass {
     }
 }
 
-const module = angular
+export default angular
     .module('asyncFilterModule', [])
-    .filter('async', () => new AsyncFilterClass().transform);
-    
-export default module.name;
+    .filter('async', () => new AsyncFilterClass().transform)
+    .name;

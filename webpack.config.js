@@ -9,7 +9,7 @@ module.exports = {
     'index.min': './src/index.ts'
   },
 	output: {
-    path: path.resolve(__dirname, '_bundles'),
+    path: path.resolve(__dirname, 'lib'),
     filename: '[name].js',
     libraryTarget: 'umd2',
     library: 'angularjs-async-filter',
@@ -18,7 +18,7 @@ module.exports = {
   devtool: 'source-map',
   target: "web",
   optimization: {
-    minimizer: [ new UglifyJsPlugin({
+    minimizer: [new UglifyJsPlugin({
       test: /\.min\.js(\?.*)?$/i,
       sourceMap: true
     })]
