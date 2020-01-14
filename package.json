@@ -1,6 +1,6 @@
 {
     "name": "angularjs-async-filter",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "Async pipe for observable and promise in angularJs",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -15,13 +15,20 @@
     "author": "Jeffen Chen <chenjeffen@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "build": "npm run build-ts && npm run build-umd",
-        "build-ts": "tsc",
+        "build": "npm run build-umd",
         "build-umd": "webpack",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "karma start"
     },
     "devDependencies": {
         "@types/angular": "^1.6.57",
+        "angular": "^1.7.9",
+        "angular-mocks": "^1.7.9",
+        "jasmine-core": "^3.5.0",
+        "karma": "^4.4.1",
+        "karma-chrome-launcher": "^3.1.0",
+        "karma-coverage-istanbul-reporter": "^2.1.1",
+        "karma-jasmine": "^3.1.0",
+        "karma-typescript": "^4.1.1",
         "rxjs": "^6.5.4",
         "shelljs": "^0.8.3",
         "ts-loader": "^6.2.1",
