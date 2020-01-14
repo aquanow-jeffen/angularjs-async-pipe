@@ -2,8 +2,8 @@
     "name": "angularjs-async-filter",
     "version": "0.0.1",
     "description": "Async pipe for observable and promise in angularJs",
-    "main": "bundles/index.js",
-    "types": "bundles/index.d.ts",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
     "repository": "git@github.com:Jeffen/angularjs-async-pipe.git",
     "keywords": [
         "angularjs",
@@ -15,12 +15,15 @@
     "author": "Jeffen Chen <chenjeffen@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "build": "webpack",
+        "build": "npm run build-ts && npm run build-umd",
+        "build-ts": "tsc",
+        "build-umd": "webpack",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
         "@types/angular": "^1.6.57",
         "rxjs": "^6.5.4",
+        "shelljs": "^0.8.3",
         "ts-loader": "^6.2.1",
         "typescript": "^3.7.4",
         "uglifyjs-webpack-plugin": "^2.2.0",

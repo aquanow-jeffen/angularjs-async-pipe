@@ -11,14 +11,16 @@ module.exports = {
 	output: {
     path: path.resolve(__dirname, '_bundles'),
     filename: '[name].js',
-    libraryTarget: 'umd',
+    libraryTarget: 'umd2',
     library: 'angularjs-async-filter',
     umdNamedDefine: true
   },
   devtool: 'source-map',
+  target: "web",
   optimization: {
     minimizer: [ new UglifyJsPlugin({
       test: /\.min\.js(\?.*)?$/i,
+      sourceMap: true
     })]
   },
   module: {
