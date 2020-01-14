@@ -13,11 +13,11 @@
 <body ng-app="app">
     <!-- components match only elements -->
   <div ng-controller="MainCtrl as ctrl">
-    <b>Hero</b><br>
-    <div>Name: {{ctrl.hero | async:this }}</div>
-    <div>Name: {{ctrl.hero1 | async:this }}</div>
-    <button ng-click="ctrl.toggleMe()">Toggle Me</button>
-    <div ng-if="ctrl.toggle1">Name: {{ctrl.hero2 | async:this }}</div>
+    <b>Async subscriptions</b><br>
+    <div>Promise: {{ctrl.promise | async:this }}</div>
+    <div>Promise with timeout: {{ctrl.promiseWithTimeout | async:this }}</div>
+    <button ng-click="ctrl.toggleMe()">Show Observable</button>
+    <div ng-if="ctrl.toggle">Observable: {{ctrl.obs$ | async:this }}</div>
   </div>
   </body>
 </html>
