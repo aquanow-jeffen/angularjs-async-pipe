@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "outDir": "lib",
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "target": "es5",
+        "lib": [
+            "dom",
+            "es2015"
+        ],
+        "declaration": true,
+        "noUnusedLocals": true,
+        "removeComments": false
+    }
+}

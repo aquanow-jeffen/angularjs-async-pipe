@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.3/rxjs.umd.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+    <script src="../_bundles/index.js"></script>
+    <script src="./app.js"></script>
+</head>
+<body ng-app="app">
+    <!-- components match only elements -->
+  <div ng-controller="MainCtrl as ctrl">
+    <b>Async subscriptions</b><br>
+    <div>Promise: {{ctrl.promise | async:this }}</div>
+    <div>Promise with timeout: {{ctrl.promiseWithTimeout | async:this }}</div>
+    <button ng-click="ctrl.toggleMe()">Show Observable</button>
+    <div ng-if="ctrl.toggle">Observable: {{ctrl.obs$ | async:this }}</div>
+  </div>
+  </body>
+</html>
