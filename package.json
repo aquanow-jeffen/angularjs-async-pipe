@@ -17,7 +17,8 @@
     "scripts": {
         "build": "npm run build-umd",
         "build-umd": "webpack",
-        "test": "karma start"
+        "test": "karma start",
+        "test-circleci": "CHROME_BIN=/usr/bin/google-chrome karma start --single-run"
     },
     "devDependencies": {
         "@types/angular": "^1.6.57",
